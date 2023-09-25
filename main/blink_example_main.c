@@ -58,6 +58,7 @@ void app_main(void)
             ESP_LOGI(TAG, "The button is pressed");
 
             // toggle state of LED
+            
             led_state = 1;
             gpio_set_direction(TRAFFIC_LIGHT, 1);
 
