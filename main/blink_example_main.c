@@ -55,7 +55,7 @@ void app_main(void)
         button_state = gpio_get_level(BUTTON_PIN);
         
         if (last_button_state == 1 && button_state == 0) {
-             
+              
             ESP_LOGI(TAG, "The button is pressed");
 
             // toggle state of LED
