@@ -1818,3 +1818,5 @@
 7535	8106	7180591489528416	C:/FF15/blink/build/.bin_timestamp	95805e46e7e5214
 8107	8218	0	esp-idf/esptool_py/CMakeFiles/app_check_size	835405498659ab11
 8107	8218	0	C:/FF15/blink/build/esp-idf/esptool_py/CMakeFiles/app_check_size	835405498659ab11
+0	2010261	0	CMakeFiles/confserver	5403ec4a27ff861a
+0	2010261	0	C:/FF15/blink/build/CMakeFiles/confserver	5403ec4a27ff861a
