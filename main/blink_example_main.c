@@ -89,15 +89,17 @@
 #include "esp_log.h"
 #include "led_strip.h"
 #include "sdkconfig.h"
+#include <freertos/FreeRTOS.h>
+#include <freertos/task.h>
 
-#define    cPin             5 
-#define    dPin             18
-#define    ePin             19
-#define    bPin             21
-#define    aPin             22
-#define    fPin             23
-#define    gPin             4
-#define    buttonPin        15
+// #define    cPin             5 
+// #define    dPin             18
+// #define    ePin             19
+// #define    bPin             21
+// #define    aPin             22
+// #define    fPin             23
+// #define    gPin             4
+// #define    buttonPin        15
 
 // variables will change:
 // int led_state = 0;    // the current state of LED
@@ -188,66 +190,99 @@
 // }
 
 
-int pins[7] = {dPin,cPin,ePin,gPin,fPin,aPin,bPin};
-int dice_number[6][7] =   {
-                    {0,1,0,0,0,0,1}, //1
-                    {1,0,1,1,0,1,1}, //2
-                    {1,1,0,1,0,1,1}, //3
-                    {0,1,0,1,1,0,1}, //4
-                    {1,1,0,1,1,1,0}, //5
-                    {1,1,1,1,1,1,0}, //6
-                    };
-void board_config()
-{
-    gpio_reset_pin(dPin);    //d
-    gpio_reset_pin(cPin);    //c
-    gpio_reset_pin(ePin);   //e
-    gpio_reset_pin(gPin);   //g
-    gpio_reset_pin(fPin);   //f
-    gpio_reset_pin(aPin);   //a
-    gpio_reset_pin(bPin);   //b
-    gpio_reset_pin(buttonPin);   //button
+// int pins[7] = {dPin,cPin,ePin,gPin,fPin,aPin,bPin};
+// int dice_number[6][7] =   {
+//                     {0,1,0,0,0,0,1}, //1
+//                     {1,0,1,1,0,1,1}, //2
+//                     {1,1,0,1,0,1,1}, //3
+//                     {0,1,0,1,1,0,1}, //4
+//                     {1,1,0,1,1,1,0}, //5
+//                     {1,1,1,1,1,1,0}, //6
+//                     };
+// void board_config()
+// {
+//     gpio_reset_pin(dPin);    //d
+//     gpio_reset_pin(cPin);    //c
+//     gpio_reset_pin(ePin);   //e
+//     gpio_reset_pin(gPin);   //g
+//     gpio_reset_pin(fPin);   //f
+//     gpio_reset_pin(aPin);   //a
+//     gpio_reset_pin(bPin);   //b
+//     gpio_reset_pin(buttonPin);   //button
 
-    gpio_set_direction(dPin, GPIO_MODE_OUTPUT);
-    gpio_set_direction(cPin, GPIO_MODE_OUTPUT);
-    gpio_set_direction(ePin, GPIO_MODE_OUTPUT);
-    gpio_set_direction(gPin, GPIO_MODE_OUTPUT);
-    gpio_set_direction(fPin, GPIO_MODE_OUTPUT);
-    gpio_set_direction(aPin, GPIO_MODE_OUTPUT);
-    gpio_set_direction(bPin, GPIO_MODE_OUTPUT);
-    gpio_set_direction(buttonPin, GPIO_MODE_INPUT);
-    gpio_set_pull_mode(buttonPin, GPIO_PULLUP_ONLY);
-}
+//     gpio_set_direction(dPin, GPIO_MODE_OUTPUT);
+//     gpio_set_direction(cPin, GPIO_MODE_OUTPUT);
+//     gpio_set_direction(ePin, GPIO_MODE_OUTPUT);
+//     gpio_set_direction(gPin, GPIO_MODE_OUTPUT);
+//     gpio_set_direction(fPin, GPIO_MODE_OUTPUT);
+//     gpio_set_direction(aPin, GPIO_MODE_OUTPUT);
+//     gpio_set_direction(bPin, GPIO_MODE_OUTPUT);
+//     gpio_set_direction(buttonPin, GPIO_MODE_INPUT);
+//     gpio_set_pull_mode(buttonPin, GPIO_PULLUP_ONLY);
+// }
 
-bool is_button_pressed()
-{
-    return (gpio_get_level(buttonPin) == 0);
-}
+// bool is_button_pressed()
+// {
+//     return (gpio_get_level(buttonPin) == 0);
+// }
 
 
-void app_main(void)
-{
-    board_config();
-    int dice_state = rand() % 6 ;
-    while (1) {
-        for (int i = 0; i < 7; i++)
-        {
-            gpio_set_level(pins[i], dice_number[dice_state][i]);
-        }
-        if(is_button_pressed())
-        {
-            dice_state = rand() % 6;
+// void app_main(void)
+// {
+//     board_config();
+//     int dice_state = rand() % 6 ;
+//     while (1) {
+//         for (int i = 0; i < 7; i++)
+//         {
+//             gpio_set_level(pins[i], dice_number[dice_state][i]);
+//         }
+//         if(is_button_pressed())
+//         {
+//             dice_state = rand() % 6;
             
-            for (int i = 0; i < 7; i++)
-            {
-                gpio_set_level(pins[i], dice_number[dice_state][i]);
-            }
-            while (is_button_pressed())
-            {
-                vTaskDelay(1); 
-            }
+//             for (int i = 0; i < 7; i++)
+//             {
+//                 gpio_set_level(pins[i], dice_number[dice_state][i]);
+//             }
+//             while (is_button_pressed())
+//             {
+//                 vTaskDelay(1); 
+//             }
             
-        }
+//         }
         
+//     }
+// }
+
+static const char *TAG = "log :";
+
+TaskHandle_t firstTaskHandle = NULL;
+TaskHandle_t secondTaskHandle = NULL;
+TaskHandle_t thirdTaskHandle = NULL;
+
+void firstTask(void *arg){
+    while(1){
+        ESP_LOGE(TAG,"Task 1000ms");
+        vTaskDelay(100 / portTICK_PERIOD_MS);
     }
+}
+
+void secondTask(void *arg){
+    while(1){
+        ESP_LOGW(TAG,"Task 100ms");
+        vTaskDelay(1000 / portTICK_PERIOD_MS);
+    }
+}
+
+void thirdTask(void *arg){
+    while(1){
+        ESP_LOGI(TAG,"Task 3000ms");
+        vTaskDelay(3000 / portTICK_PERIOD_MS);
+    }
+}
+
+void app_main(void){
+    xTaskCreate(firstTask, "First_Task", 4096, NULL, 1, &firstTaskHandle);
+    xTaskCreate(secondTask, "Second_Task", 4096, NULL, 2, &secondTaskHandle);
+    xTaskCreate(thirdTask, "Third_Task", 4096, NULL, 3, &thirdTaskHandle);
 }
