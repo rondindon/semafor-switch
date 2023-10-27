@@ -226,7 +226,6 @@
 //     return (gpio_get_level(buttonPin) == 0);
 // }
 
-
 // void app_main(void)
 // {
 //     board_config();
