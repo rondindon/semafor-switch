@@ -189,7 +189,6 @@
 //     }
 // }
 
-
 // int pins[7] = {dPin,cPin,ePin,gPin,fPin,aPin,bPin};
 // int dice_number[6][7] =   {
 //                     {0,1,0,0,0,0,1}, //1
